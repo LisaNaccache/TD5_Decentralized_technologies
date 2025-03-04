@@ -58,12 +58,16 @@ export async function node(
     // this route is used to start the consensus algorithm
     // node.get("/start", async (req, res) => {});
     node.get("/start", async (req, res) => {
-        if (state.killed) {
+        if (state.killed || !nodesAreReady()) {
             return res.status(400).send("Node is stopped");
         }
 
         if (!nodesAreReady()) {
             return res.status(400).send("Nodes are not ready");
+        }
+
+        if (isFaulty) {
+            return res.status(200).send("Faulty node does not participate");
         }
 
         state.k = 0;
